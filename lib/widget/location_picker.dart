@@ -3,9 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 class LocationPicker extends StatefulWidget {
-  final Function(LatLng)? onPositionChanged;  // Add a callback property
-
-  const LocationPicker({super.key, this.onPositionChanged});
+  const LocationPicker({super.key});
 
   @override
   State<LocationPicker> createState() => _LocationPickerState();
@@ -25,45 +23,66 @@ class _LocationPickerState extends State<LocationPicker> {
     setState(() {
       _currentCenter = camera.center;
     });
+  }
 
-    // Invoke the callback if it's provided
-    if (widget.onPositionChanged != null) {
-      widget.onPositionChanged!(_currentCenter);
-    }
+  void _confirmLocation() {
+    Navigator.pop(context, _currentCenter);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        FlutterMap(
-          mapController: mapController,
-          options: MapOptions(
-            initialCenter: const LatLng(16.824709, 96.124771),
-            initialZoom: 11,
-            onPositionChanged: _onPositionChanged,
-          ),
-          children: [
-            TileLayer(
-              urlTemplate: 'http://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
-              userAgentPackageName: 'com.happer64bit.wakemeup',
-            ),
-          ],
-        ),
-        const Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(100),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+          child: Row(
             children: [
-              Icon(
-                Icons.location_pin,
-                color: Colors.red,
-                size: 40,
+              const Text(
+                "Pick Location",
+                style: TextStyle(fontSize: 20),
               ),
-              SizedBox(height: 40), // Adjust the height based on your icon size
+              const Spacer(),
+              TextButton(
+                onPressed: _confirmLocation,
+                child: const Text("CONFIRM"),
+              ),
             ],
           ),
         ),
-      ],
+      ),
+      body: Stack(
+        children: [
+          FlutterMap(
+            mapController: mapController,
+            options: MapOptions(
+              initialCenter: const LatLng(16.824709, 96.124771),
+              initialZoom: 11,
+              onPositionChanged: _onPositionChanged,
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'http://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+                userAgentPackageName: 'com.happer64bit.wakemeup',
+              ),
+            ],
+          ),
+          const Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(height: 40),
+                Icon(
+                  Icons.location_pin,
+                  color: Colors.red,
+                  size: 40,
+                ),
+                SizedBox(height: 40),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
