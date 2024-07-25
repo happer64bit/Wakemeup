@@ -16,10 +16,17 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   GoRouter router = GoRouter(
     routes: [
-      GoRoute(
-        path: "/",
-        builder: (context, state) => const HomeScreen()
-      )
+      ShellRoute(
+        builder: (context, state, child) => SafeArea(
+          child: child,
+        ),
+        routes: [
+          GoRoute(
+            path: "/",
+            builder: (context, state) => const HomeScreen()
+          ),
+        ]
+      ),
     ]
   );
   @override
