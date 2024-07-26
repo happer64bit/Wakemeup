@@ -32,10 +32,12 @@ class _LocationPickerState extends State<LocationPicker> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(100),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+          color: Colors.white,
+          padding: const EdgeInsets.only(top: 30, bottom: 10, left: 20, right: 20),
           child: Row(
             children: [
               const Text(

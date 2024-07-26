@@ -61,25 +61,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> _initializeLocation() async {
+    print("INIT RUN FUN");
+
     final SharedPreferences prefs = await _prefs;
     
+    print("INIT RUN");
     setState(() {
       isConfirmed = prefs.getBool("isActive") ?? false;
+      print(isConfirmed);
     });
 
     Location location = Location();
     LocationData currentLocationData = await location.getLocation();
+    print("INIT");
     setState(() {
       currentLocation = LatLng(currentLocationData.latitude!, currentLocationData.longitude!);
+      print(currentLocation);
     });
 
     location.onLocationChanged.listen((LocationData current) {
       final latitude = current.latitude;
       final longitude = current.longitude;
 
+      print(latitude);
+      print(longitude);
+
       if (latitude != null && longitude != null) {
         setState(() {
           currentLocation = LatLng(latitude, longitude);
+          print(currentLocation);
         });
         _checkIfUserInRange();
       }
@@ -106,6 +116,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     bottomSheetModalAnimationController.dispose();
     audioPlayer.dispose();
     super.dispose();
+  }
+
+  void _stopAlarm() async {
+    final SharedPreferences prefs = await _prefs;
+
+    await prefs.setBool("isActive", false);
+    await prefs.remove("lat");
+    await prefs.remove("long");
+
+    audioPlayer.stop();
+    setState(() {
+      isConfirmed = false;
+      selectedLocation = null;
+    });
   }
 
   void onSetAlarmButtonPressed(BuildContext context) {
@@ -275,12 +299,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             height: 70,
             padding: const EdgeInsets.all(10.0),
             child: InkWell(
-              onTap: () => onSetAlarmButtonPressed(context),
+              onTap: isConfirmed ? _stopAlarm : () => onSetAlarmButtonPressed(context),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade700.withOpacity(0.95),
+                  color: isConfirmed 
+                    ? Colors.red.shade700.withOpacity(0.95)
+                    : Colors.blue.shade700.withOpacity(0.95),
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
@@ -291,11 +317,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     )
                   ]
                 ),
-                child: const Align(
+                child: Align(
                   alignment: Alignment.center,
                   child: Text(
-                    "Set Alarm",
-                    style: TextStyle(color: Colors.white),
+                    isConfirmed ? "Stop Alarm" : "Set Alarm",
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
               ),
